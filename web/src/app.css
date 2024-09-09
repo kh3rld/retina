@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply h-screen dark:bg-black dark:text-violet-50;
+    }
+
+    input {
+        @apply rounded px-4 py-2 dark:bg-neutral-900;
+    }
+}
