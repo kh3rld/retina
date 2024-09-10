@@ -21,4 +21,4 @@
     </div>
 </nav>
 
-<div class="fixed h-full w-80 dark:bg-neutral-900"></div>
+<div class="fixed h-full w-80 border-r-2 dark:border-neutral-900"></div>
