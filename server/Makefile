@@ -3,3 +3,6 @@ dev:
 
 build api:
 	@go build -o ./bin/api ./cmd/api
+
+clean:
+	@go clean -modcache
