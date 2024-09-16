@@ -1,7 +1,6 @@
 package server
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 )
@@ -10,17 +9,13 @@ type Server struct {
 	port int
 }
 
-func NewServer() *http.Server {
+func NewServer(prod *bool) *http.Server {
 	s := &Server{
 		port: 8080,
 	}
 
-	devMode := flag.Bool("dev", false, "run in development mode")
-
-	flag.Parse()
-
 	allowedOrigins := []string{"*"}
-	if *devMode {
+	if *prod {
 		allowedOrigins = []string{"http://localhost:5173"}
 	}
 

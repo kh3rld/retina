@@ -19,23 +19,32 @@ func (s *Server) RegisterRoutes(allowedOrigins []string) http.Handler {
 		AllowedOrigins: allowedOrigins,
 	}))
 
-	r.Get("/api/hello", s.handleHello)
-	r.Get("/auth/{provider}/callback", s.handleAuthCallback)
+	r.Get("/api/hello", s.HandleHello)
+	r.Get("/auth/{provider}", s.HandleAuth)
+	r.Get("/auth/{provider}/callback", s.HandleAuthCallback)
+	r.Get("/logout/{provider}", s.HandleLogout)
 
 	return r
 }
 
-func (s *Server) handleHello(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleHello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, world!"))
 }
 
-func (s *Server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleAuth(w http.ResponseWriter, r *http.Request) {
 	provider := chi.URLParam(r, "provider")
+	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
+	gothic.BeginAuthHandler(w, r)
+}
+
+func (s *Server) HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
+	provider := chi.URLParam(r, "provider")
 	r = r.WithContext(context.WithValue(context.Background(), "provider", provider))
 
 	user, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
+		log.Println(err)
 		fmt.Fprintln(w, r)
 		return
 	}
@@ -43,4 +52,10 @@ func (s *Server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	log.Println(user)
 
 	http.Redirect(w, r, "http://localhost:5173", http.StatusFound)
+}
+
+func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	gothic.Logout(w, r)
+	w.Header().Set("Location", "/")
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
