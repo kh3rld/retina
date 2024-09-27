@@ -51,6 +51,12 @@ func (s *Server) HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(user)
 
+	rows, _ := s.db.Query(context.Background(), "SELET FROM users WHERE email=$1;", user.Email)
+	defer rows.Close()
+	if !rows.Next() {
+		s.db.CreateUser(user.Email)
+	}
+
 	http.Redirect(w, r, "http://localhost:5173", http.StatusFound)
 }
 

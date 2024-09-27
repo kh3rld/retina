@@ -4,9 +4,11 @@ import (
 	"flag"
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/mathletedev/retina/internal/auth"
+	"github.com/mathletedev/retina/internal/db"
 	"github.com/mathletedev/retina/internal/server"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -24,6 +26,8 @@ func main() {
 	auth.NewAuth(prod)
 
 	s := server.NewServer(prod)
+	d := db.NewDatabase()
+	defer d.Close()
 
 	log.Println("server started!")
 	log.Fatal(s.ListenAndServe())
