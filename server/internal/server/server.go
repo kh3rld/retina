@@ -7,12 +7,15 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/gorilla/sessions"
+	"github.com/mathletedev/retina/internal/auth"
 	"github.com/mathletedev/retina/internal/db"
 )
 
 type Server struct {
-	port int
-	db   *db.Database
+	port  int
+	db    *db.Database
+	store *sessions.CookieStore
 }
 
 func NewServer(prod *bool) *http.Server {
@@ -27,13 +30,21 @@ func NewServer(prod *bool) *http.Server {
 	}
 
 	allowedOrigins := []string{"*"}
-	if *prod {
+	if !*prod {
 		allowedOrigins = []string{"http://localhost:5173"}
 	}
 
+	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+	store.Options.Path = "/"
+	store.Options.HttpOnly = true
+	store.Options.Secure = *prod
+	store.Options.SameSite = http.SameSiteLaxMode
+	store.Options.MaxAge = auth.MaxAge
+
 	s := &Server{
-		port: port,
-		db:   db.NewDatabase(),
+		port:  port,
+		db:    db.NewDatabase(),
+		store: store,
 	}
 
 	return &http.Server{

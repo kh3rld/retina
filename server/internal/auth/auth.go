@@ -10,20 +10,20 @@ import (
 	"github.com/markbates/goth/providers/google"
 )
 
-const (
-	Key    = "randomkey"
-	MaxAge = 60 * 60 * 25 * 7
-)
+const MaxAge = 60 * 60 * 24 * 7
 
 func NewAuth(prod *bool) {
+	sessionKey := os.Getenv("SESSION_KEY")
+
 	googleClientId := os.Getenv("GOOGLE_CLIENT_ID")
 	googleClientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
 
-	store := sessions.NewCookieStore([]byte(Key))
+	store := sessions.NewCookieStore([]byte(sessionKey))
 	store.Options.Path = "/"
 	store.Options.HttpOnly = true
 	store.Options.Secure = *prod
 	store.Options.SameSite = http.SameSiteLaxMode
+	store.Options.MaxAge = MaxAge
 
 	gothic.Store = store
 

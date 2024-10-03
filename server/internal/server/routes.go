@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,10 +17,12 @@ func (s *Server) RegisterRoutes(allowedOrigins []string) http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: allowedOrigins,
+		AllowedOrigins:   allowedOrigins,
+		AllowCredentials: true,
 	}))
 
 	r.Get("/api/hello", s.HandleHello)
+	r.Get("/api/me", s.HandleMe)
 	r.Get("/auth/{provider}", s.HandleAuth)
 	r.Get("/auth/{provider}/callback", s.HandleAuthCallback)
 	r.Get("/logout/{provider}", s.HandleLogout)
@@ -29,6 +32,16 @@ func (s *Server) RegisterRoutes(allowedOrigins []string) http.Handler {
 
 func (s *Server) HandleHello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello, world!"))
+}
+
+func (s *Server) HandleMe(w http.ResponseWriter, r *http.Request) {
+	user, err := gothic.GetFromSession("user", r)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	w.Write([]byte(user))
 }
 
 func (s *Server) HandleAuth(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +62,11 @@ func (s *Server) HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(user)
+	encodedUser, _ := json.Marshal(user)
+	gothic.StoreInSession("user", string(encodedUser), r, w)
 
-	rows, _ := s.db.Query(context.Background(), "SELET FROM users WHERE email=$1;", user.Email)
+	// create user if one doesn't exist
+	rows, _ := s.db.Query(context.Background(), "SELECT FROM users WHERE email=$1;", user.Email)
 	defer rows.Close()
 	if !rows.Next() {
 		s.db.CreateUser(user.Email)

@@ -5,10 +5,18 @@
     let content = "Loading...";
 
     onMount(async () => {
-        const res = await fetch(`${SERVER_URL}/api/hello`);
-        const data = await res.text();
+        const res = await fetch(`${SERVER_URL}/api/me`, {
+            credentials: "include",
+        });
 
-        content = data;
+        if (res.status === 401) {
+            content = "Hello, world!";
+            return;
+        }
+
+        const data = await res.json();
+
+        content = `Hello ${data.RawData.email}!`;
     });
 </script>
 
