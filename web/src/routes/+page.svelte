@@ -6,7 +6,7 @@
 
     onMount(async () => {
         const res = await fetch(`${SERVER_URL}/api/me`, {
-            credentials: "include",
+            credentials: "include", // allows cookies to be sent to server
         });
 
         if (res.status === 401) {
