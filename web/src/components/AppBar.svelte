@@ -1,19 +1,30 @@
 <script lang="ts">
     import { SERVER_URL } from "$lib/config";
-    import type { User } from "$lib/types/user";
+    import type { User } from "$types/user";
     import { Icon, MagnifyingGlass } from "svelte-hero-icons";
+    import AppBarMenu from "./AppBarMenu.svelte";
 
     export let user: User | null;
 
     let search = "";
+    let showMenu = false;
+    let menuAnchor: HTMLElement | null;
 
-    const handleSignIn = () => {
+    const toggleMenu = () => {
+        showMenu = !showMenu;
+    };
+
+    const closeMenu = () => {
+        showMenu = false;
+    };
+
+    const signIn = () => {
         window.location.href = `${SERVER_URL}/auth/google`;
     };
 </script>
 
 <nav
-    class="flex h-12 items-center border-b-2 py-8 pr-8 dark:border-violet-900 dark:bg-neutral-900"
+    class="flex h-16 items-center border-b-2 pr-8 dark:border-violet-900 dark:bg-neutral-900"
 >
     <a class="w-80 text-center text-2xl dark:text-violet-400" href="/">Retina</a
     >
@@ -30,7 +41,11 @@
     </div>
     <div class="grow"></div>
     {#if user}
-        <a class="h-10 w-10 rounded-full p-0 hover:shadow" href="/profile">
+        <button
+            class="h-10 w-10 rounded-full p-0 hover:shadow"
+            on:click={toggleMenu}
+            bind:this={menuAnchor}
+        >
             <img
                 class="rounded-full"
                 width="100%"
@@ -38,11 +53,19 @@
                 src={user.picture}
                 alt="profile_picture"
             />
-        </a>
+        </button>
+        {#if showMenu && menuAnchor}
+            <AppBarMenu
+                x={menuAnchor.offsetLeft + menuAnchor.offsetWidth / 2}
+                close={closeMenu}
+            >
+                <a href={`${SERVER_URL}/signout/google`}>Sign out</a>
+            </AppBarMenu>
+        {/if}
     {:else}
         <button
             class="h-10 rounded-full px-4 hover:shadow dark:bg-violet-700"
-            on:click={handleSignIn}
+            on:click={signIn}
         >
             Sign in
         </button>

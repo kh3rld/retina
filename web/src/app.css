@@ -14,4 +14,8 @@
     button {
         @apply rounded px-2 py-1 transition-colors;
     }
+
+    a {
+        @apply hover:underline dark:text-indigo-300;
+    }
 }

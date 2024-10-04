@@ -22,4 +22,6 @@
 
 <AppBar user={data.user} />
 
-<slot />
+<div class="h-[calc(100vh-64px)]">
+    <slot />
+</div>

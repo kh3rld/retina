@@ -17,8 +17,6 @@
 
         const data = await res.json();
 
-        console.log(data);
-
         content = `Hello ${data.RawData.email}!`;
     });
 </script>

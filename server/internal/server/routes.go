@@ -26,7 +26,7 @@ func (s *Server) RegisterRoutes(allowedOrigins []string) http.Handler {
 	r.Get("/api/me", s.HandleMe)
 	r.Get("/auth/{provider}", s.HandleAuth)
 	r.Get("/auth/{provider}/callback", s.HandleAuthCallback)
-	r.Get("/logout/{provider}", s.HandleLogout)
+	r.Get("/signout/{provider}", s.HandleSignout)
 
 	return r
 }
@@ -76,7 +76,7 @@ func (s *Server) HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, config.WebUrl, http.StatusFound)
 }
 
-func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleSignout(w http.ResponseWriter, r *http.Request) {
 	gothic.Logout(w, r)
 	w.Header().Set("Location", config.WebUrl)
 	w.WriteHeader(http.StatusTemporaryRedirect)
