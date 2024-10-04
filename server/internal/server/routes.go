@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/markbates/goth/gothic"
+	"github.com/mathletedev/retina/internal/config"
 )
 
 func (s *Server) RegisterRoutes(allowedOrigins []string) http.Handler {
@@ -72,11 +73,11 @@ func (s *Server) HandleAuthCallback(w http.ResponseWriter, r *http.Request) {
 		s.db.CreateUser(user.Email)
 	}
 
-	http.Redirect(w, r, "http://localhost:5173", http.StatusFound)
+	http.Redirect(w, r, config.WebUrl, http.StatusFound)
 }
 
 func (s *Server) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	gothic.Logout(w, r)
-	w.Header().Set("Location", "/")
+	w.Header().Set("Location", config.WebUrl)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

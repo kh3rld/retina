@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/sessions"
 	"github.com/mathletedev/retina/internal/auth"
+	"github.com/mathletedev/retina/internal/config"
 	"github.com/mathletedev/retina/internal/db"
 )
 
@@ -31,7 +32,7 @@ func NewServer(prod *bool) *http.Server {
 
 	allowedOrigins := []string{"*"}
 	if !*prod {
-		allowedOrigins = []string{"http://localhost:5173"}
+		allowedOrigins = []string{config.WebUrl}
 	}
 
 	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))

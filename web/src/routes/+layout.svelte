@@ -1,7 +1,10 @@
 <script lang="ts">
-    import AppBar from "$lib/AppBar.svelte";
+    import AppBar from "$components/AppBar.svelte";
     import { onMount } from "svelte";
     import "../app.css";
+    import type { PageData } from "./$types";
+
+    export let data: PageData;
 
     // tailwindcss dark mode
     onMount(() => {
@@ -17,8 +20,6 @@
     });
 </script>
 
-<AppBar />
+<AppBar user={data.user} />
 
-<div class="ml-80">
-    <slot />
-</div>
+<slot />
